@@ -174,9 +174,21 @@ public class Swerve{
 		private double y = 0.0;
 		
 		
+		
+		public double getHeadingInDegrees()
+	    {
+	        return Util.boundAngle0to360Degrees(gyro.getAngle());
+	        
+	    }
 		public void updateCoord(){
-		   //add two lines
+			double distanceTravelled = ((leftDriveEncoder.getDistance() + rightDriveEncoder.getDistance())/2.0) - distanceLast;
+	        double timePassed = System.currentTimeMillis() - timeLast;
+	        speedX = distanceTravelled/timePassed;
+			x += distanceTravelled * Math.cos(Math.toRadians(getHeadingInDegrees()));
+			y += distanceTravelled * Math.sin(Math.toRadians(getHeadingInDegrees()));
 		}
+				
+		
 		public double getX(){
 			return x;
 		}
@@ -294,9 +306,9 @@ public class Swerve{
 		return value;
 	}
 	
-	double MaxCorrection(double forwardThrot, double scalor) {
+	double MaxCorrection(double forwardThrot, double scalar) {
 		if(forwardThrot < 0) {forwardThrot = -forwardThrot;}
-		forwardThrot *= scalor;
+		forwardThrot *= scalar;
 		if(forwardThrot < 0.20)
 			return 0.20;
 		return forwardThrot;
