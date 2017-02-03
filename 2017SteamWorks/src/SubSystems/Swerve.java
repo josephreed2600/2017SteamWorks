@@ -97,7 +97,7 @@ public class Swerve{
     	setHeading(adjust);
     	tracking = true;
 	}
-	public void sendInput(double x, double y, double rotateX,double rotateY,boolean halfPower,boolean robotCentric,boolean moonMenuever){
+	public void sendInput(double x, double y, double rotateX, double rotateY, boolean halfPower, boolean robotCentric, boolean moonMenuever){
 		tracking = false;
 		SmartDashboard.putNumber("X Stick", rotateX);
 		SmartDashboard.putNumber("Y Stick", rotateY);
