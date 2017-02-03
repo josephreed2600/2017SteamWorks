@@ -175,11 +175,8 @@ public class Swerve{
 		
 		
 		
-		public double getHeadingInDegrees()
-	    {
-	        return Util.boundAngle0to360Degrees(gyro.getAngle());
-	        
-	    }
+		public double getHeadingInDegrees(){return Util.boundAngle0to360Degrees(gyro.getAngle());}
+		
 		public void updateCoord(){
 			double distanceTravelled = ((leftDriveEncoder.getDistance() + rightDriveEncoder.getDistance())/2.0) - distanceLast;
 	        double timePassed = System.currentTimeMillis() - timeLast;
@@ -188,13 +185,11 @@ public class Swerve{
 			y += distanceTravelled * Math.sin(Math.toRadians(getHeadingInDegrees()));
 		}
 				
+		public double getX(){return x;}
+		public double getY(){return y;}
 		
-		public double getX(){
-			return x;
-		}
-		public double getY(){
-			return y;
-		}
+		
+		
 		public void debugValues(){
 			//Note #3
 			SmartDashboard.putNumber("ROT_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()));
