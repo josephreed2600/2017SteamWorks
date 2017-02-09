@@ -72,7 +72,7 @@ public class Swerve {
 			instance = new Swerve();
 		return instance;
 	}
-	public void pigeonUpdate(){
+	public void pigeonUpdate() {
 		PigeonImu.GeneralStatus genStatus = new PigeonImu.GeneralStatus();
 		PigeonImu.FusionStatus fusionStatus = new PigeonImu.FusionStatus();
 		double [] xyz_dps = new double [3];
@@ -94,7 +94,7 @@ public class Swerve {
 		tracking = false;
 		SmartDashboard.putNumber("X Stick", rotateX);
 		SmartDashboard.putNumber("Y Stick", rotateY);
-		if(moonManeuver) {
+		if (moonManeuver) {
 			headingController = HeadingController.Off;
 			yInput = 0.0;
 			xInput = -(rotateX * 0.2) * ((Math.abs(y)*2)+1);
@@ -127,7 +127,7 @@ public class Swerve {
 				rotationCorrection = 0;
 			} else {
 			}
-			if(halfPower) {
+			if (halfPower) {
 				y = y * 0.5;
 				x = x * 0.5;			
 			} else {
@@ -137,7 +137,7 @@ public class Swerve {
 			if (x == 0.0 && y == 0.0) {
 				rotateInput = rotateInput + rotationCorrection;
 			} else {
-				if(halfPower)
+				if (halfPower)
 					rotateInput = (rotateInput * rotationScaleFactor) + rotationCorrection;
 				else
 					rotateInput = (rotateInput * rotationScaleFactorFast) + rotationCorrection;
@@ -211,7 +211,7 @@ public class Swerve {
 		    }
 
 		public void setDriveSpeed(double power) {
-			if(wheelError() < 10)
+			if (wheelError() < 10)
 				driveMotor.set(-power);	    
 			}
 		public void stopDriveMotor() {driveMotor.set(0);}
@@ -225,7 +225,7 @@ public class Swerve {
 		rearLeft.debugValues();
 		pigeonUpdate();
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
-		if(xInput == 0 && yInput == 0 && rotateInput == 0) {
+		if (xInput == 0 && yInput == 0 && rotateInput == 0) {
 			frontLeft.stopDriveMotor();
 			frontRight.stopDriveMotor();
 			rearLeft.stopDriveMotor();
@@ -245,7 +245,7 @@ public class Swerve {
 			max = Util.normalize(max, frontLeftWheelSpeed);
 			max = Util.normalize(max, rearLeftWheelSpeed);
 			max = Util.normalize(max, rearRightWheelSpeed);
-			if(max > 1.0) {
+			if (max > 1.0) {
 				frontRightWheelSpeed /= max;
 				frontLeftWheelSpeed /= max;
 				rearLeftWheelSpeed /= max;
@@ -278,9 +278,9 @@ public class Swerve {
 	}
 	
 	double MaxCorrection(double forwardThrot, double scalar) {
-		if(forwardThrot < 0) {forwardThrot = -forwardThrot;}
+		if (forwardThrot < 0) {forwardThrot = -forwardThrot;}
 		forwardThrot *= scalar;
-		if(forwardThrot < 0.20)
+		if (forwardThrot < 0.20)
 			return 0.20;
 		return forwardThrot;
 	}
