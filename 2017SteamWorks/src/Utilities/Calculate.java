@@ -26,7 +26,7 @@ package Utilities;
         return angle%360;
     }
     
-    //returns the hypotenuse a triangle with given side lengths
+    //returns the hypotenuse of a triangle with given side lengths
     public static double hypot(double x, double y){
         return Math.sqrt(Math.pow(x, 2)+Math.pow(y, 2));
     }

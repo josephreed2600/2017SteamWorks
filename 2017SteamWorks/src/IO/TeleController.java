@@ -84,7 +84,7 @@ public class TeleController
         }
         
         if(driver.rightCenterClick.isPressed()){
-        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 closeshot
+        	robot.shooter.setSpeed(3300); //3475 far shot, 3000 close shot
         }
         if(driver.getPOV() == 0){
         	robot.shooter.bumpUp(100);
