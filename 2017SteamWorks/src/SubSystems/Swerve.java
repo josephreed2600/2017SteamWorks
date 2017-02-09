@@ -37,10 +37,10 @@ public class Swerve {
 	double kPgainSmall = 0.005;
 	double kDgainSmall = 0.004;
 	double kMaxCorrectionRatioSmall = 0.14;
-	double kMaxCorrectionRatio = 0.12; /*
-										 * cap corrective turning throttle to 30
-										 * percent of forward throttle
-										 */
+	double kMaxCorrectionRatio = 0.12;	/*
+						 * cap corrective turning throttle to 30
+						 * percent of forward throttle
+						 */
 
 	double _targetAngle = 0.0;
 	double rotationCorrection;
