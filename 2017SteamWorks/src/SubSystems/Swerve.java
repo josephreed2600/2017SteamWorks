@@ -11,7 +11,7 @@ import Utilities.Util;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Swerve{
+public class Swerve {
 	private static Swerve instance = null;
 	
 	public SwerveDriveModule frontLeft;
@@ -42,30 +42,24 @@ public class Swerve{
 	double rotationCorrection;
 	int _printLoops = 0;
 	
-	public void setHeading(double goal){
+	public void setHeading(double goal) {
 		_targetAngle = continousAngle(goal,currentAngle);		
 	}
-	public double continousAngle(double goal, double current){
+	public double continousAngle(double goal, double current) {
 		double BGA = Util.boundAngle0to360Degrees(goal);			
 		double CA = current;
 		double BCA = Util.boundAngle0to360Degrees(CA);
 		double OA = BCA - 180.0;
 		double DA  = OA - BGA;
-		if(DA < -360){
-			DA = DA + 360;
-		}
-		if(DA > 0.0){
-			return CA + 180.0 - Math.abs(DA);
-		}else{
-			return CA - 180.0 + Math.abs(DA);
-		}
+		if (DA < -360) {DA = DA + 360;}
+		if (DA > 0.0) {return CA + 180.0 - Math.abs(DA);} else {return CA - 180.0 + Math.abs(DA);}
 	}
 	enum HeadingController{
 		Off, On, Reset
 	}
 	public HeadingController headingController = HeadingController.Off;
 	
-	public Swerve(){
+	public Swerve() {
 		frontLeft  = new SwerveDriveModule(Ports.FRONT_LEFT_ROTATION,Ports.FRONT_LEFT_DRIVE,2);
 		frontRight = new SwerveDriveModule(Ports.FRONT_RIGHT_ROTATION,Ports.FRONT_RIGHT_DRIVE,1);
 		rearLeft   = new SwerveDriveModule(Ports.REAR_LEFT_ROTATION,Ports.REAR_LEFT_DRIVE,3);
@@ -73,12 +67,11 @@ public class Swerve{
 		_spareTalon = frontLeft.driveMotor;
 		_pidgey = new PigeonImu(_spareTalon);
 	}
-	public static Swerve getInstance()
-    {
-        if( instance == null )
-            instance = new Swerve();
-        return instance;
-    }
+	public static Swerve getInstance() {
+		if (instance == null)
+			instance = new Swerve();
+		return instance;
+	}
 	public void pigeonUpdate(){
 		PigeonImu.GeneralStatus genStatus = new PigeonImu.GeneralStatus();
 		PigeonImu.FusionStatus fusionStatus = new PigeonImu.FusionStatus();
@@ -92,40 +85,39 @@ public class Swerve{
 		SmartDashboard.putNumber("PigeonRate", currentAngularRate);
 		SmartDashboard.putBoolean("PigeonGood", angleIsGood);
 	}
-	public void swerveTrack(){
+	public void swerveTrack() {
 		double adjust = currentAngle - Vision.getAngle();
-    	setHeading(adjust);
-    	tracking = true;
+	    	setHeading(adjust);
+	    	tracking = true;
 	}
-	public void sendInput(double x, double y, double rotateX, double rotateY, boolean halfPower, boolean robotCentric, boolean moonMenuever){
+	public void sendInput(double x, double y, double rotateX, double rotateY, boolean halfPower, boolean robotCentric, boolean moonManeuver) {
 		tracking = false;
 		SmartDashboard.putNumber("X Stick", rotateX);
 		SmartDashboard.putNumber("Y Stick", rotateY);
-		if(moonMenuever){
+		if(moonManeuver) {
 			headingController = HeadingController.Off;
 			yInput = 0.0;
-			xInput = -(rotateX * 0.2) * ((Math.abs(y)*2)+1) ;
+			xInput = -(rotateX * 0.2) * ((Math.abs(y)*2)+1);
 			rotateInput = rotateX * 0.2;
 			SmartDashboard.putNumber("xMoon", xInput);
 			SmartDashboard.putNumber("rMoon", rotateInput);
-		}
-		else{
-			if((rotateX > 0.1 || rotateX < -0.1)){
+		} else {
+			if ((rotateX > 0.1 || rotateX < -0.1)) {
 				headingController = HeadingController.Off;
 				rotateInput = rotateX;
-			}else if(rotateX > -0.1 && rotateX < 0.1 && headingController == HeadingController.Off){
+			} else if (rotateX > -0.1 && rotateX < 0.1 && headingController == HeadingController.Off) {
 				headingController = HeadingController.On;
 				_targetAngle = currentAngle;
-			}else{
+			} else {
 				rotateInput = 0.0;
 			}
 			double angle = currentAngle/180.0*Math.PI;
 			if (headingController == HeadingController.On) {
 				double angleDiff = Math.abs(_targetAngle - currentAngle);
-				if(angleDiff < 5){
+				if (angleDiff < 5) {
 					rotationCorrection = (_targetAngle - currentAngle) * kPgainSmall - (currentAngularRate) * kDgainSmall;
 					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatioSmall);
-				}else{
+				} else {
 					rotationCorrection = (_targetAngle - currentAngle) * kPgain - (currentAngularRate) * kDgain;
 					rotationCorrection = Cap(rotationCorrection, kMaxCorrectionRatio);
 				}
@@ -135,22 +127,22 @@ public class Swerve{
 				rotationCorrection = 0;
 			} else {
 			}
-			if(halfPower){
+			if(halfPower) {
 				y = y * 0.5;
 				x = x * 0.5;			
-			}else{
+			} else {
 				y = y * 1.0;
 				x = x * 1.0;
 			}
-			if(x == 0.0 && y == 0.0){
+			if (x == 0.0 && y == 0.0) {
 				rotateInput = rotateInput + rotationCorrection;
-			}else{
+			} else {
 				if(halfPower)
 					rotateInput = (rotateInput * rotationScaleFactor) + rotationCorrection;
 				else
 					rotateInput = (rotateInput * rotationScaleFactorFast) + rotationCorrection;
 			}		
-			if(robotCentric){
+			if (robotCentric) {
 				xInput = x;
 				yInput = y;
 			}
@@ -164,7 +156,7 @@ public class Swerve{
 		update();
 	}
 	
-	public class SwerveDriveModule{
+	public class SwerveDriveModule {
 		private CANTalon rotationMotor;
 		public CANTalon driveMotor;
 		private int moduleID;
@@ -172,126 +164,110 @@ public class Swerve{
 		private int absolutePosition;
 		private double x = 0.0;
 		private double y = 0.0;
-		
-		
-		
-		public double getHeadingInDegrees(){return Util.boundAngle0to360Degrees(gyro.getAngle());}
-		
-		public void updateCoord(){
+
+		public double getHeadingInDegrees() {return Util.boundAngle0to360Degrees(gyro.getAngle());}
+
+		public void updateCoord() {
 			double distanceTravelled = ((leftDriveEncoder.getDistance() + rightDriveEncoder.getDistance())/2.0) - distanceLast;
-	        double timePassed = System.currentTimeMillis() - timeLast;
-	        speedX = distanceTravelled/timePassed;
+		        double timePassed = System.currentTimeMillis() - timeLast;
+		        speedX = distanceTravelled/timePassed;
 			x += distanceTravelled * Math.cos(Math.toRadians(getHeadingInDegrees()));
 			y += distanceTravelled * Math.sin(Math.toRadians(getHeadingInDegrees()));
 		}
 				
-		public double getX(){return x;}
-		public double getY(){return y;}
+		public double getX() {return x;}
+		public double getY() {return y;}
 		
 		
 		
-		public void debugValues(){
+		public void debugValues() {
 			//Note #3
 			SmartDashboard.putNumber("ROT_" + Integer.toString(moduleID), Util.boundAngle0to360Degrees(getCurrentAngle()));
 			SmartDashboard.putNumber("DRV_" + Integer.toString(moduleID), driveMotor.get());
 		}
-		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum){
+		public SwerveDriveModule(int rotationMotorPort, int driveMotorPort,int moduleNum) {
 			rotationMotor = new CANTalon(rotationMotorPort);
 			driveMotor = new CANTalon(driveMotorPort);
 			loadProperties();
-			moduleID = moduleNum;           
+			moduleID = moduleNum;
 		}
 		
-		public void setGoal(double goalAngle)
-	    {
-			rotationMotor.set(continousAngle(goalAngle,rotationMotor.get()));
-	    }
-		public double wheelError(){
-			return Math.abs(rotationMotor.getSetpoint() - rotationMotor.get());
-		}
-	    public final void loadProperties()
-	    {
-	    	absolutePosition = rotationMotor.getPulseWidthPosition() & 0xFFF;
-	    	rotationMotor.setEncPosition(absolutePosition);
-	    	rotationMotor.setFeedbackDevice(FeedbackDevice.AnalogEncoder);
-	    	rotationMotor.reverseSensor(true);
-	    	rotationMotor.reverseOutput(false);
-	    	rotationMotor.configPotentiometerTurns(360);
-	    	rotationMotor.configNominalOutputVoltage(+0f, -0f);
-	    	rotationMotor.configPeakOutputVoltage(+12f, -12f);
-	    	rotationMotor.setAllowableClosedLoopErr(0); 
-	    	rotationMotor.changeControlMode(TalonControlMode.Position);
-//	    	rotationMotor.setPID(0.1, 0.0, 0.4, 0.050, 0, 0.0, 0);
-	    	rotationMotor.setProfile(0);
-	    	rotationMotor.set(rotationMotor.get());
-	    }
-	   
-	    public void setDriveSpeed(double power){
-	    	if(wheelError() < 10)
-	    		driveMotor.set(-power);	    
-	   	}
-	    public void stopDriveMotor(){
-	    	driveMotor.set(0);
-	    }
-		public double getCurrentAngle(){
-			return rotationMotor.get();
-		}
-		
+		public void setGoal(double goalAngle) {rotationMotor.set(continousAngle(goalAngle,rotationMotor.get()));}
+		public double wheelError() {return Math.abs(rotationMotor.getSetpoint() - rotationMotor.get());}
+		public final void loadProperties() {
+			absolutePosition = rotationMotor.getPulseWidthPosition() & 0xFFF;
+			rotationMotor.setEncPosition(absolutePosition);
+			rotationMotor.setFeedbackDevice(FeedbackDevice.AnalogEncoder);
+			rotationMotor.reverseSensor(true);
+			rotationMotor.reverseOutput(false);
+			rotationMotor.configPotentiometerTurns(360);
+			rotationMotor.configNominalOutputVoltage(+0f, -0f);
+			rotationMotor.configPeakOutputVoltage(+12f, -12f);
+			rotationMotor.setAllowableClosedLoopErr(0); 
+			rotationMotor.changeControlMode(TalonControlMode.Position);
+	//	    	rotationMotor.setPID(0.1, 0.0, 0.4, 0.050, 0, 0.0, 0);
+			rotationMotor.setProfile(0);
+			rotationMotor.set(rotationMotor.get());
+		    }
+
+		public void setDriveSpeed(double power) {
+			if(wheelError() < 10)
+				driveMotor.set(-power);	    
+			}
+		public void stopDriveMotor() {driveMotor.set(0);}
+		public double getCurrentAngle() {return rotationMotor.get();}
 	}
-	
-	public void update(){
+
+	public void update() {
 		frontRight.debugValues();
 		frontLeft.debugValues();
 		rearRight.debugValues();
 		rearLeft.debugValues();
 		pigeonUpdate();
 		SmartDashboard.putNumber("Target Heading", _targetAngle);
-		
-		if(xInput == 0 && yInput == 0 && rotateInput == 0){
+		if(xInput == 0 && yInput == 0 && rotateInput == 0) {
 			frontLeft.stopDriveMotor();
 			frontRight.stopDriveMotor();
 			rearLeft.stopDriveMotor();
 			rearRight.stopDriveMotor();
-		}
-		
-		else{
+		} else {
 			double A = xInput - rotateInput * (Constants.WHEELBASE_LENGTH / R);
-	        double B = xInput + rotateInput * (Constants.WHEELBASE_LENGTH / R);
-	        double C = yInput - rotateInput * (Constants.WHEELBASE_WIDTH / R);
-	        double D = yInput + rotateInput * (Constants.WHEELBASE_WIDTH / R);
-	        
-	        double frontRightWheelSpeed = Math.sqrt((B * B) + (C * C));
-	        double frontLeftWheelSpeed  = Math.sqrt((B * B) + (D * D));
-	        double rearLeftWheelSpeed   = Math.sqrt((A * A) + (D * D));
-	        double rearRightWheelSpeed  = Math.sqrt((A * A) + (C * C));
-	       
-	        double max = frontRightWheelSpeed;
-	        max = Util.normalize(max, frontLeftWheelSpeed);
-	        max = Util.normalize(max, rearLeftWheelSpeed);
-	        max = Util.normalize(max, rearRightWheelSpeed);
-	        if(max > 1.0){
-	        	frontRightWheelSpeed /= max;
-	            frontLeftWheelSpeed /= max;
-	            rearLeftWheelSpeed /= max;
-	            rearRightWheelSpeed /= max;
-	        }        
+			double B = xInput + rotateInput * (Constants.WHEELBASE_LENGTH / R);
+			double C = yInput - rotateInput * (Constants.WHEELBASE_WIDTH / R);
+			double D = yInput + rotateInput * (Constants.WHEELBASE_WIDTH / R)
 
-	        double frontRightSteeringAngle = Math.atan2(B, C)*180/Math.PI; 
-	        double frontLeftSteeringAngle = Math.atan2(B, D)*180/Math.PI;
-	        double rearLeftSteeringAngle = Math.atan2(A, D)*180/Math.PI;
-	        double rearRightSteeringAngle = Math.atan2(A, C)*180/Math.PI;
-	        
-	        frontLeft.setGoal(frontLeftSteeringAngle);
+			double frontRightWheelSpeed = Math.sqrt((B * B) + (C * C));
+			double frontLeftWheelSpeed  = Math.sqrt((B * B) + (D * D));
+			double rearLeftWheelSpeed   = Math.sqrt((A * A) + (D * D));
+			double rearRightWheelSpeed  = Math.sqrt((A * A) + (C * C));
+
+			double max = frontRightWheelSpeed;
+			max = Util.normalize(max, frontLeftWheelSpeed);
+			max = Util.normalize(max, rearLeftWheelSpeed);
+			max = Util.normalize(max, rearRightWheelSpeed);
+			if(max > 1.0) {
+				frontRightWheelSpeed /= max;
+				frontLeftWheelSpeed /= max;
+				rearLeftWheelSpeed /= max;
+				rearRightWheelSpeed /= max;
+			}
+
+			double frontRightSteeringAngle = Math.atan2(B, C)*180/Math.PI; 
+			double frontLeftSteeringAngle = Math.atan2(B, D)*180/Math.PI;
+			double rearLeftSteeringAngle = Math.atan2(A, D)*180/Math.PI;
+			double rearRightSteeringAngle = Math.atan2(A, C)*180/Math.PI;
+
+			frontLeft.setGoal(frontLeftSteeringAngle);
 			frontRight.setGoal(frontRightSteeringAngle);
 			rearLeft.setGoal(rearLeftSteeringAngle);
 			rearRight.setGoal(rearRightSteeringAngle);
-			
+
 			frontLeft.setDriveSpeed(-frontLeftWheelSpeed);
 			frontRight.setDriveSpeed(frontRightWheelSpeed);
 			rearLeft.setDriveSpeed(-rearLeftWheelSpeed);
 			rearRight.setDriveSpeed(rearRightWheelSpeed);
 		}
-	}	
+	}
 	
 	double Cap(double value, double peak) {
 		if (value < -peak)
